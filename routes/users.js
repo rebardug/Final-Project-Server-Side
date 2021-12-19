@@ -64,7 +64,7 @@ router.get("/id/:id",verify, async (req, res,next) => {
     }
 });
 //GET
-//get user specific by id
+//get user specific by email
 router.get("/email/:email", async (req, res,next) => {
     try {
         const user = await User.findOne({ email: req.params.email });
