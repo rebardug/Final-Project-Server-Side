@@ -1,12 +1,11 @@
 const router = require('express').Router();
 const User = require('../models/UserSchema');
 const ErrorResponse = require('../utils/errorResponse');
-const verify = require('../middleware/verifyToken');
 const bcrypt = require('bcrypt');
 
 //PUT
 //update a user
-router.put("/:id", verify, async (req, res, next) => {
+router.put("/:id", async (req, res, next) => {
     if (req.user._id === req.params.id || req.user.userType === "admin") {
         if (req.body.password) {
             const salt = await bcrypt.genSalt(10);
@@ -31,7 +30,7 @@ router.put("/:id", verify, async (req, res, next) => {
 
 //DELETE
 //delete a user
-router.delete("/:id", verify, async (req, res, next) => {
+router.delete("/:id",  async (req, res, next) => {
     if (req.user._id === req.params.id || req.user.userType === "admin") {
         try {
             await User.findByIdAndDelete(req.params.id);
@@ -46,7 +45,7 @@ router.delete("/:id", verify, async (req, res, next) => {
 
 //GET
 //get user specific by email
-router.get("/exists/email/:email",verify, async (req, res,next) => {
+router.get("/exists/email/:email", async (req, res,next) => {
     const user = await User.findOne({ email: req.body.email })
     const { password, ...others } = user._doc;
     res.status(200).json(others);
@@ -54,7 +53,7 @@ router.get("/exists/email/:email",verify, async (req, res,next) => {
 
 //GET
 //get user specific by id
-router.get("/id/:id",verify, async (req, res,next) => {
+router.get("/id/:id", async (req, res,next) => {
     try {
         const user = await User.findById(req.params.id);
         const { password, ...others } = user._doc;
@@ -77,9 +76,11 @@ router.get("/email/:email", async (req, res,next) => {
 
 //GET
 //get all users
-router.get("/", verify, async (req, res, next) => {
-    const query=req.query.new
-    if (req.user.userType === "admin") {
+router.post('/admin', async (req, res, next) => {
+    console.log(req.body.CurrentUser.userType);
+
+    if (req.body.CurrentUser.userType === "admin") {
+        //console.log(req.body);
         try {
             const users=query ? await User.find().limit(10) : await User.find()
             res.status(200).json(users);
@@ -90,17 +91,5 @@ router.get("/", verify, async (req, res, next) => {
         return next(new ErrorResponse("You are not allowed to see all users!", 403))
     }
 });
-
-//GET stats
-// router.get("/stats",verify, async (req, res,next) => {
-//     try {
-//         const today = new Date();
-//         const lastyear = today.setFullYear(today.setFullYear() - 1);
-//         const user = await User.findById(req.params.id);
-//         const { password, ...others } = user._doc;
-//         res.status(200).json(others);
-//     } catch (err) {
-//         res.status(500).json(err);
-//     }
-// });
+router.get('/all', async (req, res, next) => {console.log("we are home")})
 module.exports = router;

@@ -2,7 +2,6 @@ const router = require("express").Router();
 const User = require('../models/UserSchema')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const { registerValidation, loginValidation } = require("../utils/validation")
 const ErrorResponse = require('../utils/errorResponse');
 // const crypto = require('crypto');
 
@@ -51,15 +50,10 @@ router.post('/register', async (req, res, next) => {
 //POST
 //login user
 router.post('/login',async (req, res, next) => {
+    console.log(req.body);
     if (!req.body.email || !req.body.password)
         return next(new ErrorResponse('missing fields', 400))
     try {
-        //Joi validate
-        console.log(req.body);
-        const { error } = loginValidation(req.body);
-        if (error)
-            return next(new ErrorResponse(error.details[0].message), 400)
-
         //check if email is in database
         const user = await User.findOne({ email: req.body.email })
         if (!user)
