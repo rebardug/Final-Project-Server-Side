@@ -77,15 +77,14 @@ router.post('/login',async (req, res, next) => {
 router.post('/tasks', async (req, res, next) => {
     if (req.body.CurrentUser.userType === "admin"||req.body.CurrentUser.userType === "user") {        
         try {
-            const users= await User.find({userType:'user'}).sort({points: -1})
-            res.status(200).json(users);
-        
+            const tasks= await User.find({})
+            res.status(200).json(tasks);
         } catch (error) {
             next(error)
         }
     }else
     
-    return next(new ErrorResponse("You are not allowed to see statistics", 403))
+    return next(new ErrorResponse("You are not allowed to see tasks", 403))
     // if (req.body.currentUser.userType === "admin"||req.body.currentUser.userType === "user") { 
     //     try {
     //         const tasks= await Task.find({})
