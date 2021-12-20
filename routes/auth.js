@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const User = require('../models/UserSchema')
+const Task = require('../models/TaskSchema')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const ErrorResponse = require('../utils/errorResponse');
@@ -14,11 +15,6 @@ router.post('/register', async (req, res, next) => {
     if (!req.body.email || !req.body.password || !req.body.name)
         return next(new ErrorResponse('missing fields', 400))
     try {
-        //Joi validate
-        const { error } = registerValidation(req.body);
-        if (error)
-            return next(new ErrorResponse(error.details[0].message), 400)
-
         //check if email already exists
         const emailExist = await User.findOne({ email: req.body.email })
         if (emailExist)
@@ -77,6 +73,51 @@ router.post('/login',async (req, res, next) => {
         next(error)
     }
 })
+
+router.post('/tasks', async (req, res, next) => {
+    if (req.body.CurrentUser.userType === "admin"||req.body.CurrentUser.userType === "user") {        
+        try {
+            const users= await User.find({userType:'user'}).sort({points: -1})
+            res.status(200).json(users);
+        
+        } catch (error) {
+            next(error)
+        }
+    }else
+    
+    return next(new ErrorResponse("You are not allowed to see statistics", 403))
+    // if (req.body.currentUser.userType === "admin"||req.body.currentUser.userType === "user") { 
+    //     try {
+    //         const tasks= await Task.find({})
+    //         res.status(200).json(tasks);
+    //     } catch (error) {
+    //         next(error)
+    //     }
+    // } else
+    // return next(new ErrorResponse("You are not allowed to see all tasks!", 403))
+
+});
+
+router.post('/setTask', async (req, res, next) => {
+    console.log(req.body)
+    try {
+        //check if email already exists
+        const taskExist = await Task.findOne({ Description: req.body.description})
+        if (taskExist)
+            return next(new ErrorResponse('Task already exists'), 400)
+        //add new User
+        const newTask = new Task({
+            Description: req.body.description
+        })
+        const task = await newTask.save();
+        // const { password, ...others } = user._doc;
+        console.log("Task added: ",task);
+        res.status(201)
+    } catch (error) {
+        next(error)
+    }
+})
+
 
 //POST
 //forgot password

@@ -93,27 +93,29 @@ router.post('/admin', async (req, res, next) => {
     }
 });
 
-router.get('/user', async (req, res, next) => {
-        //console.log(req.body);
-        try {
-            const users= await User.find({userType:'user'})
-            res.status(200).json(users);
-            //console.log(users);
-        } catch (error) {
-            next(error)
-        }
+router.post('/user', async (req, res, next) => {
+        if (req.body.CurrentUser.userType === "admin") {
+            try {
+                const users= await User.find({userType:'user'})
+                res.status(200).json(users);
+            } catch (error) {
+                next(error)
+            }
+        }else
         return next(new ErrorResponse("You are not allowed to see all users!", 403))
     
 });
-router.get('/stats', async (req, res, next) => {
-    //console.log(req.body);
-    try {
-        const users= await User.find({userType:'user'}).sort({points: -1})
-        res.status(200).json(users);
-        //console.log(users);
-    } catch (error) {
-        next(error)
-    }
+router.post('/stats', async (req, res, next) => {
+    if (req.body.CurrentUser.userType === "admin"||req.body.CurrentUser.userType === "user") {        
+        try {
+            const users= await User.find({userType:'user'}).sort({points: -1})
+            res.status(200).json(users);
+        
+        } catch (error) {
+            next(error)
+        }
+    }else
+    
     return next(new ErrorResponse("You are not allowed to see statistics", 403))
 
 });
