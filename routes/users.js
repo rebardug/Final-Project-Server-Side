@@ -75,21 +75,48 @@ router.get("/email/:email", async (req, res,next) => {
 });
 
 //GET
-//get all users
+//get all admins
 router.post('/admin', async (req, res, next) => {
-    console.log(req.body.CurrentUser.userType);
+    
 
     if (req.body.CurrentUser.userType === "admin") {
         //console.log(req.body);
         try {
-            const users=query ? await User.find().limit(10) : await User.find()
+            const users= await User.find({userType:'admin'})
             res.status(200).json(users);
+            //console.log(users);
         } catch (error) {
             next(error)
         }
     } else {
-        return next(new ErrorResponse("You are not allowed to see all users!", 403))
+        return next(new ErrorResponse("You are not allowed to see all admins!", 403))
     }
 });
+
+router.get('/user', async (req, res, next) => {
+        //console.log(req.body);
+        try {
+            const users= await User.find({userType:'user'})
+            res.status(200).json(users);
+            //console.log(users);
+        } catch (error) {
+            next(error)
+        }
+        return next(new ErrorResponse("You are not allowed to see all users!", 403))
+    
+});
+router.get('/stats', async (req, res, next) => {
+    //console.log(req.body);
+    try {
+        const users= await User.find({userType:'user'}).sort({points: -1})
+        res.status(200).json(users);
+        //console.log(users);
+    } catch (error) {
+        next(error)
+    }
+    return next(new ErrorResponse("You are not allowed to see statistics", 403))
+
+});
+
 router.get('/all', async (req, res, next) => {console.log("we are home")})
 module.exports = router;
