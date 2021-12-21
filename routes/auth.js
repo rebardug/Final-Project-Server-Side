@@ -73,48 +73,42 @@ router.post('/login',async (req, res, next) => {
         next(error)
     }
 })
-
 router.post('/tasks', async (req, res, next) => {
     if (req.body.CurrentUser.userType === "admin"||req.body.CurrentUser.userType === "user") {        
         try {
-            const tasks= await User.find({})
+            const tasks= await Task.find({})
             res.status(200).json(tasks);
         } catch (error) {
             next(error)
         }
     }else
     
-    return next(new ErrorResponse("You are not allowed to see tasks", 403))
-    // if (req.body.currentUser.userType === "admin"||req.body.currentUser.userType === "user") { 
-    //     try {
-    //         const tasks= await Task.find({})
-    //         res.status(200).json(tasks);
-    //     } catch (error) {
-    //         next(error)
-    //     }
-    // } else
-    // return next(new ErrorResponse("You are not allowed to see all tasks!", 403))
+    return next(new ErrorResponse("You are not allowed to see statistics", 403))
 
 });
 
 router.post('/setTask', async (req, res, next) => {
-    console.log(req.body)
-    try {
+    if (req.body.CurrentUser.userType === "admin")
+    {
+        try {
         //check if email already exists
-        const taskExist = await Task.findOne({ Description: req.body.description})
-        if (taskExist)
-            return next(new ErrorResponse('Task already exists'), 400)
+            const taskExist = await Task.findOne({ Description: req.body.description})
+            if (taskExist)
+                return next(new ErrorResponse('Task already exists'), 400)
         //add new User
-        const newTask = new Task({
-            Description: req.body.description
-        })
-        const task = await newTask.save();
+            const newTask = new Task({
+                Description: req.body.description
+            })
+            const task = await newTask.save();
         // const { password, ...others } = user._doc;
-        console.log("Task added: ",task);
-        res.status(201)
-    } catch (error) {
-        next(error)
-    }
+            console.log("Task added: ",task);
+            res.status(201)
+        } catch (error) {
+            next(error)
+        }
+    } else
+    return next(new ErrorResponse("You are not allowed to see statistics", 403))
+
 })
 
 

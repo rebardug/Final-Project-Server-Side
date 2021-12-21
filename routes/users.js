@@ -110,7 +110,6 @@ router.post('/stats', async (req, res, next) => {
         try {
             const users= await User.find({userType:'user'}).sort({points: -1})
             res.status(200).json(users);
-        
         } catch (error) {
             next(error)
         }
