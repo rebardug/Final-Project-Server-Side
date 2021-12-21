@@ -111,6 +111,45 @@ router.post('/setTask', async (req, res, next) => {
 
 })
 
+router.post('/deleteTask', async (req, res, next) => {
+    if (req.body.CurrentUser.userType === "admin")
+    {
+        try {
+        //check if email already exists
+            const taskExist = await Task.findOne({ Description: req.body.description})
+            if (!taskExist)
+                return next(new ErrorResponse('Task does not exists'), 400)
+            Task.deleteOne({ Description: req.body.description})
+        // const { password, ...others } = user._doc;
+            console.log("Task deleted: ",req.body.description);
+            res.status(201)
+        } catch (error) {
+            next(error)
+        }
+    } else
+    return next(new ErrorResponse("You are not allowed to delete Tasks", 403))
+
+})
+
+router.post('/deleteUser', async (req, res, next) => {
+    if (req.body.CurrentUser.userType === "admin")
+    {
+        try {
+        //check if email already exists
+            const userExist = await User.findOne({ email: req.body.email})
+            if (!userExist)
+                return next(new ErrorResponse('User does not exists'), 400)
+            User.deleteOne({ Description: req.body.description})
+        // const { password, ...others } = user._doc;
+            console.log("User deleted: ",req.body.email);
+            res.status(201)
+        } catch (error) {
+            next(error)
+        }
+    } else
+    return next(new ErrorResponse("You are not allowed to see statistics", 403))
+
+})
 
 //POST
 //forgot password
