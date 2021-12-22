@@ -120,14 +120,19 @@ router.post('/stats', async (req, res, next) => {
 
 });
 router.post('/changePermission', async (req, res, next) => {
-    if (req.body.CurrentUser.userType === "admin") {        
+    if (req.body.CurrentUser.userType === "admin") {  
+        let auth="admin";      
         try {
+            const helper= await User.find({email: req.body.email})
+            if (helper.userType === "admin"){
+                let auth="user";
+            }                
             // const users= await User.find({email: req.body.email})
             // const update = { userType: "user" };
             // users.updateOne(update);
             const users = await User.findOneAndUpdate(
                 { email: req.body.email },
-                { userType: "user" },
+                { userType: auth },
                 { new: false }
             );
             console.log(users)
@@ -136,7 +141,6 @@ router.post('/changePermission', async (req, res, next) => {
             next(error)
         }
     }else
-    
     return next(new ErrorResponse("You are not allowed to see statistics", 403))
 
 });
