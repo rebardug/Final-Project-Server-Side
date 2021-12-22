@@ -109,6 +109,49 @@ router.post('/stats', async (req, res, next) => {
     if (req.body.CurrentUser.userType === "admin"||req.body.CurrentUser.userType === "user") {        
         try {
             const users= await User.find({userType:'user'}).sort({points: -1})
+            console.log(users)
+            res.status(200).json(users);
+        } catch (error) {
+            next(error)
+        }
+    }else
+    
+    return next(new ErrorResponse("You are not allowed to see statistics", 403))
+
+});
+router.post('/changePermission', async (req, res, next) => {
+    if (req.body.CurrentUser.userType === "admin") {        
+        try {
+            // const users= await User.find({email: req.body.email})
+            // const update = { userType: "user" };
+            // users.updateOne(update);
+            const users = await User.findOneAndUpdate(
+                { email: req.body.email },
+                { userType: "user" },
+                { new: false }
+            );
+            console.log(users)
+            res.status(200).json(users);
+        } catch (error) {
+            next(error)
+        }
+    }else
+    
+    return next(new ErrorResponse("You are not allowed to see statistics", 403))
+
+});
+router.post('/changePoints', async (req, res, next) => {
+    if (req.body.currentUser.userType === "admin") {        
+        try {
+            // const users= await User.find({email: req.body.email})
+            // const update = { userType: "user" };
+            // users.updateOne(update);
+            const users = await User.findOneAndUpdate(
+                { email: req.body.email },
+                { points: req.body.num },
+                { new: false }
+            );
+            console.log(users)
             res.status(200).json(users);
         } catch (error) {
             next(error)
